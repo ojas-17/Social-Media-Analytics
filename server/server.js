@@ -3,7 +3,7 @@ const axios = require('axios');
 const vader = require('vader-sentiment');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
@@ -91,10 +91,12 @@ app.post('/analyze-comments', async (req, res) => {
   }
 });
 
-app.get('/test', (req, res) => {
-  res.json({'Server is running': true});
+app.get('/', (req, res) => {
+  res.send('Server is running');
 })
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+module.exports = app;
