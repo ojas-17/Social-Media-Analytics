@@ -91,6 +91,10 @@ app.post('/analyze-comments', async (req, res) => {
   }
 });
 
+app.get('/test', (req, res) => {
+  res.send('Server id running')
+})
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
