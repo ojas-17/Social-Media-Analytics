@@ -92,7 +92,7 @@ app.post('/analyze-comments', async (req, res) => {
 });
 
 app.get('/test', (req, res) => {
-  res.send('Server is running');
+  res.json({'Server is running': true});
 })
 
 app.listen(PORT, () => {
