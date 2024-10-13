@@ -13,7 +13,7 @@ function App() {
   const [sentimentData, setSentimentData] = useState(null);
   const [insightsData, setInsightsData] = useState(null);
 
-  const backendURL = 'https://social-media-analytics.vercel.app'
+  const backendURL = 'https://social-media-analytics-backend.vercel.app/'
 
   // Fetch sentiment analysis
   const handleAnalyzeSentiment = async () => {
