@@ -13,10 +13,12 @@ function App() {
   const [sentimentData, setSentimentData] = useState(null);
   const [insightsData, setInsightsData] = useState(null);
 
+  const backendURL = 'https://social-media-analytics.vercel.app'
+
   // Fetch sentiment analysis
   const handleAnalyzeSentiment = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/analyze-comments', {
+      const response = await axios.post(`${backendURL}/analyze-comments`, {
         mediaId,
         accessToken
       });
@@ -30,7 +32,7 @@ function App() {
   // Fetch insights
   const handleFetchInsights = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/fetch-insights', {
+      const response = await axios.post(`${backendURL}/fetch-insights`, {
         mediaId,
         userId,
         accessToken
