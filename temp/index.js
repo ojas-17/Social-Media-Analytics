@@ -73,7 +73,7 @@ app.get('/media/:mediaId/comments', async (req, res) => {
   }
 });
 
-app.get('/', () => {
+app.get('/', (req, res) => {
     res.send('Server is running');
 })
 
