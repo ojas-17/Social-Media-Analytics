@@ -73,6 +73,10 @@ app.get('/media/:mediaId/comments', async (req, res) => {
   }
 });
 
+app.get('/', () => {
+    res.send('Server is running');
+})
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
