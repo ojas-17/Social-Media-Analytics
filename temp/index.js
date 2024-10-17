@@ -8,6 +8,12 @@ const app = express();
 // Set up session middleware
 app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: true }));
 
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://vercel.live https://connect.facebook.net;");
+  next();
+});
+
+
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
