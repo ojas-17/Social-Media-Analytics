@@ -61,6 +61,10 @@ app.get('/profile', (req, res) => {
   res.json(req.user); // Return user details
 });
 
+app.get('/', (req, res) => {
+  res.send('Server is running');
+})
+
 // Start server
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
