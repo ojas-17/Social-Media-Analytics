@@ -177,6 +177,8 @@ function AccountPage() {
                     </div>
                 </div>
 
+                <div className={`h-[65vh] w-px ${theme === 'light' ? 'bg-black' : 'bg-white'}`}></div>
+
                 {
                     sidebarOption === 1 && (
                         <div className='w-3/4 min-h-96 pl-10 flex flex-col gap-10'>
