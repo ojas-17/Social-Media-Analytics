@@ -42,16 +42,16 @@ function Header() {
                 accountPopUp && (
                     <div className='fixed top-0 left-0'>
                         <div className='fixed top-0 left-0 w-full h-screen' onClick={() => setAccountPopUp(false)}></div>
-                        <div className={`fixed right-5 top-24 w-1/5 rounded-2xl px-5 ${theme === 'light' ? 'bg-green-400' : 'bg-green-600'}`}>
-                            <div className='p-5 flex gap-3 items-center cursor-pointer' onClick={() => {
-                                navigate('/account')
-                                setAccountPopUp(false)
+                        <div className={`fixed right-5 top-24 w-1/5 rounded-2xl py-3 px-5 ${theme === 'light' ? 'bg-green-400' : 'bg-green-600'}`}>
+                            <div className={`p-5 flex gap-3 items-center cursor-pointer rounded-xl ${theme === 'light' ? 'hover:bg-green-300' : 'hover:bg-green-700'} `} onClick={() => {
+                            navigate('/account')
+                            setAccountPopUp(false)
                             }}>
                                 <FontAwesomeIcon className='aspect-square w-[32px]' icon={faUser} />
                                 <span>Account</span>
                             </div>
 
-                            <div className='p-5 flex gap-3 items-center cursor-pointer' onClick={logoutUser}>
+                            <div className={`p-5 flex gap-3 items-center cursor-pointer rounded-xl ${theme === 'light' ? 'hover:bg-green-300' : 'hover:bg-green-700'} `} onClick={logoutUser}>
                                 <FontAwesomeIcon className='aspect-square w-[32px]' icon={faRightFromBracket} />
                                 <span>Logout</span>
                             </div>

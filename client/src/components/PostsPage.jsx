@@ -19,12 +19,12 @@ function PostsPage() {
     }, [user])
 
     return (
-        <div className='w-5/6 flex flex-col flex-wrap'>
-            <div className='w-full flex justify-center text-3xl my-10'>Your Posts</div>
+        <div className='w-5/6 mt-20 flex flex-col flex-wrap'>
+            <div className='w-full flex justify-center text-4xl my-10'>Your Posts</div>
 
             {
                 user?._id && (
-                    <div className='flex gap-5 '>
+                    <div className='flex flex-wrap gap-5 '>
                     {
                         posts && posts.map((post) => {
                             return (
