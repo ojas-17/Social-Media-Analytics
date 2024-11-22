@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://social-media-analytics-frontend.vercel.app'],
     credentials: true,
 }));
 
@@ -40,4 +40,4 @@ connectDB()
   console.log("MONGO DB connection failed", error);
 });
 
-export {app};
+export default app;
