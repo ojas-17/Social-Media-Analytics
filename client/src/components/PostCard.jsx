@@ -8,7 +8,7 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 function PostCard({ post }) {
     const { theme } = useThemeContext()
     return (
-        <div className={`w-[300px] flex flex-col rounded-xl border-4 transition-transform duration-200 hover:scale-105 ${theme === 'light' ? 'border-green-400 bg-neutral-300' : 'border-green-600 bg-neutral-900'}`}>
+        <div className={`w-[400px] flex flex-col rounded-xl border-4 transition-transform duration-200 hover:scale-105 ${theme === 'light' ? 'border-green-400 bg-neutral-300' : 'border-green-600 bg-neutral-900'}`}>
             <Link className={`w-full`} to={`/posts/${post.id}`}>
                 <img className='object-cover rounded-t-xl aspect-[4/3]' src={post?.media_url} alt="" />
             </Link>
