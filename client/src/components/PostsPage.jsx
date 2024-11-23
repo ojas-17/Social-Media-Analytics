@@ -24,7 +24,7 @@ function PostsPage() {
 
             {
                 user?._id && (
-                    <div className='flex flex-wrap justify-between '>
+                    <div className='flex flex-wrap gap-5 justify-between '>
                     {
                         posts && posts.map((post) => {
                             return (
