@@ -2,21 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Pie, Bar, Line } from 'react-chartjs-2';
 import { useParams } from 'react-router-dom';
 import { useUserContext } from '../contexts/userContext';
-
 import { Chart, ArcElement, BarElement, LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import WordCloud from 'react-wordcloud';
 
-// Register the necessary elements
+// Register the necessary chart elements
 Chart.register(
-  ArcElement, 
-  BarElement, 
-  LineElement, 
-  PointElement, // Register PointElement for Line chart
-  CategoryScale, 
-  LinearScale, 
-  Tooltip, 
+  ArcElement,
+  BarElement,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
   Legend
 );
-
 
 function InsightsPage() {
   const { mediaId } = useParams();
@@ -25,6 +24,10 @@ function InsightsPage() {
   const [insightsData, setInsightsData] = useState(null);
   const [sentimentOverTimeData, setSentimentOverTimeData] = useState(null);
   const [keywordsData, setKeywordsData] = useState(null);
+  const [commentersData, setCommentersData] = useState(null);
+  const [commentLengths, setCommentLengths] = useState(null);
+  const [avgCommentLength, setAvgCommentLength] = useState(0);
+  const [avgSentiment, setAvgSentiment] = useState(null);
 
   useEffect(() => {
     if (user?._id) {
@@ -49,12 +52,42 @@ function InsightsPage() {
       setSentimentData(data.sentimentCounts);
       setSentimentOverTimeData(data.sentimentOverTime);
       setKeywordsData(data.keywordsData);
+
+      // Calculate Comment Lengths
+      const lengths = data.keywordsData.map(item => item.text.length);
+      setCommentLengths(lengths);
+      setAvgCommentLength(lengths.reduce((acc, length) => acc + length, 0) / lengths.length);
+
+      // Calculate average sentiment score (could be weighted based on the number of comments)
+      const avgPos = (data.sentimentCounts.Positive || 0) * 1;
+      const avgNeu = (data.sentimentCounts.Neutral || 0) * 0;
+      const avgNeg = (data.sentimentCounts.Negative || 0) * -1;
+      setAvgSentiment((avgPos + avgNeu + avgNeg) / (data.sentimentCounts.Positive + data.sentimentCounts.Neutral + data.sentimentCounts.Negative));
+
+      // Get Top Commenters and sort them
+      const commenters = data.keywordsData.reduce((acc, item) => {
+        acc[item.username] = (acc[item.username] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Sort commenters by the number of comments in descending order and get the top 5
+      const sortedCommenters = Object.entries(commenters)
+        .sort((a, b) => b[1] - a[1]) // Sort by comment count (descending)
+        .slice(0, 5); // Limit to top 5 commenters
+
+      // Update the commentersData state with sorted top commenters
+      const topCommenters = sortedCommenters.reduce((acc, [username, count]) => {
+        acc[username] = count;
+        return acc;
+      }, {});
+
+      setCommentersData(topCommenters);
     } catch (error) {
       console.error('Error analyzing comments', error);
     }
   };
 
-  // Fetch insights
+  // Fetch insights data
   const handleFetchInsights = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/insights/fetch-insights/${mediaId}`, options);
@@ -65,7 +98,7 @@ function InsightsPage() {
     }
   };
 
-  // Data for pie chart
+  // Pie chart for sentiment distribution
   const pieChartData = sentimentData ? {
     labels: ['Positive', 'Neutral', 'Negative'],
     datasets: [{
@@ -76,7 +109,7 @@ function InsightsPage() {
     }],
   } : null;
 
-  // Data for bar chart (Sentiment distribution)
+  // Bar chart for sentiment distribution
   const barChartData = sentimentData ? {
     labels: ['Positive', 'Neutral', 'Negative'],
     datasets: [{
@@ -88,7 +121,7 @@ function InsightsPage() {
     }],
   } : null;
 
-  // Data for bar chart (Insights data)
+  // Bar chart for insights data
   const barChartData2 = insightsData ? {
     labels: Object.keys(insightsData),
     datasets: [{
@@ -100,7 +133,7 @@ function InsightsPage() {
     }],
   } : null;
 
-  // Data for line chart (Sentiment over time)
+  // Sentiment over time line chart
   const sentimentOverTimeChartData = sentimentOverTimeData ? {
     labels: Object.keys(sentimentOverTimeData),
     datasets: [
@@ -125,25 +158,69 @@ function InsightsPage() {
     ],
   } : null;
 
+  // Stacked bar chart for sentiment over time
+  const stackedBarChartData = sentimentOverTimeData ? {
+    labels: Object.keys(sentimentOverTimeData),
+    datasets: [
+      {
+        label: 'Positive Sentiment',
+        data: Object.values(sentimentOverTimeData).map(date => date.positive),
+        backgroundColor: '#66b3ff',
+      },
+      {
+        label: 'Neutral Sentiment',
+        data: Object.values(sentimentOverTimeData).map(date => date.neutral),
+        backgroundColor: '#99ff99',
+      },
+      {
+        label: 'Negative Sentiment',
+        data: Object.values(sentimentOverTimeData).map(date => date.negative),
+        backgroundColor: '#ff9999',
+      },
+    ],
+  } : null;
+
+  // Bar chart for top commenters
+  const topCommentersData = commentersData ? {
+    labels: Object.keys(commentersData),
+    datasets: [{
+      label: 'Comment Count',
+      data: Object.values(commentersData),
+      backgroundColor: '#66b3ff',
+      borderColor: '#000000',
+      borderWidth: 1,
+    }],
+  } : null;
+
+  // Histogram for comment length
+  const commentLengthHistogramData = commentLengths ? {
+    labels: commentLengths.map((_, i) => `Comment ${i + 1}`),
+    datasets: [{
+      label: 'Comment Length',
+      data: commentLengths,
+      backgroundColor: '#99ccff',
+      borderColor: '#000000',
+      borderWidth: 1,
+    }],
+  } : null;
+
   return (
-    <div className="flex flex-col gap-20 items-center">
+    <div className="flex flex-col gap-20 items-center mb-20">
       <h1 className='text-4xl mt-20 pt-10 flex justify-center'>Social Media Analytics</h1>
 
       {sentimentData && (
         <div className='flex flex-col items-center gap-10'>
           <div>Sentiment Data</div>
           <div className='flex gap-20'>
-            <div>
-              <div style={{ width: '400px', height: '400px' }}>
-                <Pie data={pieChartData} />
-              </div>
+            <div style={{ width: '400px', height: '400px' }}>
+              <Pie data={pieChartData} />
             </div>
-
-            <div>
-              <div style={{ width: '600px', height: '400px' }}>
-                <Bar data={barChartData} />
-              </div>
+            <div style={{ width: '600px', height: '400px' }}>
+              <Bar data={barChartData} />
             </div>
+          </div>
+          <div>
+            <h3>Average Sentiment Score: {avgSentiment.toFixed(2)}</h3>
           </div>
         </div>
       )}
@@ -151,10 +228,8 @@ function InsightsPage() {
       {insightsData && (
         <div className='flex flex-col items-center gap-10'>
           <div>Insights Data</div>
-          <div className='flex justify-center'>
-            <div style={{ width: '600px', height: '400px' }}>
-              <Bar data={barChartData2} />
-            </div>
+          <div style={{ width: '600px', height: '400px' }}>
+            <Bar data={barChartData2} />
           </div>
         </div>
       )}
@@ -165,6 +240,9 @@ function InsightsPage() {
           <div style={{ width: '800px', height: '400px' }}>
             <Line data={sentimentOverTimeChartData} />
           </div>
+          <div style={{ width: '800px', height: '400px' }}>
+            <Bar data={stackedBarChartData} options={{ indexAxis: 'x', stacked: true }} />
+          </div>
         </div>
       )}
 
@@ -172,13 +250,28 @@ function InsightsPage() {
         <div className='flex flex-col items-center gap-10'>
           <div>Keywords Extracted from Comments</div>
           <div>
-            <ul>
-              {keywordsData.map((item, index) => (
-                <li key={index}>
-                  <strong>{item.username}:</strong> {item.keywords.join(', ')}
-                </li>
-              ))}
-            </ul>
+            <WordCloud words={keywordsData.map(item => ({ text: item.keywords.join(' '), value: 100 }))} />
+          </div>
+        </div>
+      )}
+
+      {commentersData && (
+        <div className='flex flex-col items-center gap-10'>
+          <div>Top Commenters</div>
+          <div style={{ width: '600px', height: '400px' }}>
+            <Bar data={topCommentersData} />
+          </div>
+        </div>
+      )}
+
+      {commentLengths && (
+        <div className='flex flex-col items-center gap-10'>
+          <div>Comment Length Histogram</div>
+          <div style={{ width: '600px', height: '400px' }}>
+            <Bar data={commentLengthHistogramData} />
+          </div>
+          <div>
+            <h3>Average Comment Length: {avgCommentLength.toFixed(2)} characters</h3>
           </div>
         </div>
       )}

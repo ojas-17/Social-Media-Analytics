@@ -2,8 +2,43 @@ import mongoose from "mongoose";
 import { User } from '../models/user.model.js';
 import axios from 'axios';
 import vader from 'vader-sentiment';
+import natural from 'natural';
+import moment from 'moment';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+
+import Sentiment from 'sentiment';
+const sentiment = new Sentiment();
+
+// Sentiment analysis
+const analyzeSentiment = (text) => {
+    const result = sentiment.analyze(text);
+    return result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
+};
+
+// Extract keywords
+const extractKeywords = (text) => {
+    const tokenizer = new natural.WordTokenizer();
+    return tokenizer.tokenize(text).filter(word => word.length > 3); // Filter out short words
+};
+
+// Sentiment over time analysis
+const analyzeSentimentOverTime = (comments) => {
+    const groupedByDate = {};
+
+    comments.forEach(comment => {
+        const date = moment(comment.timestamp).format('YYYY-MM-DD'); // Group by day
+        const sentiment = analyzeSentiment(comment.text);
+
+        if (!groupedByDate[date]) {
+            groupedByDate[date] = { positive: 0, neutral: 0, negative: 0 };
+        }
+
+        groupedByDate[date][sentiment]++;
+    });
+
+    return groupedByDate;
+};
 
 const fetchInsights = async (req, res, next) => {
     try {
@@ -19,7 +54,7 @@ const fetchInsights = async (req, res, next) => {
             metric: "likes,comments,shares,saved,total_interactions,profile_visits",
             access_token: accessToken,
         };
-        // console.log({insightsUrl, insightsParams});
+
         const insightsResponse = await axios.get(insightsUrl, {
             params: insightsParams,
         });
@@ -47,13 +82,14 @@ const fetchInsights = async (req, res, next) => {
         insightsData["Followers Count"] = followersCount;
 
         return res
-        .status(200)
-        .json({ insightsData });
+            .status(200)
+            .json({ insightsData });
     } catch (error) {
         next(error);
     }
 };
 
+// Analyze comments and provide sentiment counts
 const analyzeComments = async (req, res, next) => {
     try {
         const { mediaId } = req.params;
@@ -89,9 +125,19 @@ const analyzeComments = async (req, res, next) => {
             }
         });
 
+        // Analyze sentiment over time
+        const sentimentOverTime = analyzeSentimentOverTime(comments);
+
+        // Extract keywords for each comment
+        const keywordsData = comments.map(comment => ({
+            username: comment.username,
+            text: comment.text,
+            keywords: extractKeywords(comment.text)
+        }));
+
         return res
-        .status(200)
-        .json({ sentimentCounts, comments });
+            .status(200)
+            .json({ sentimentCounts, sentimentOverTime, keywordsData, comments });
 
     } catch (error) {
         next(error);
@@ -101,4 +147,4 @@ const analyzeComments = async (req, res, next) => {
 export {
     fetchInsights,
     analyzeComments
-}
+};
