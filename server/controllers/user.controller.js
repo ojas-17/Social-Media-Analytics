@@ -120,8 +120,8 @@ const login = async (req, res, next) => {
 
         const options = {
             httpOnly: true,
-            secure: false,
-            sameSite: 'lax'
+            secure: true,
+            sameSite: 'None'
         }
 
         return res
