@@ -246,14 +246,14 @@ function InsightsPage() {
         </div>
       )}
 
-      {keywordsData && (
+      {/* {keywordsData && (
         <div className='flex flex-col items-center gap-10'>
           <div>Keywords Extracted from Comments</div>
           <div>
             <WordCloud words={keywordsData.map(item => ({ text: item.keywords.join(' '), value: 100 }))} />
           </div>
         </div>
-      )}
+      )} */}
 
       {commentersData && (
         <div className='flex flex-col items-center gap-10'>
