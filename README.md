@@ -60,14 +60,14 @@ Social Media Analytics is a web-based application designed to analyze and visual
 
    ```bash
    cd server
-   npm start
+   npm run dev
    ```
 
 2. **Start the Frontend Application:**
 
    ```bash
    cd ../client
-   npm start
+   npm run dev
    ```
 
 3. **Access the Application:**
